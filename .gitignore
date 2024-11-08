@@ -1,0 +1,29 @@
+# Terraform
+kafka-setup/.terraform/
+kafka-setup/*.tfstate
+kafka-setup/*.tfstate.*
+kafka-setup/crash.log
+kafka-setup/*.tfplan
+kafka-setup/terraform.tfvars.json
+kafka-setup/override.tf
+kafka-setup/override.tf.json
+kafka-setup/*_override.tf
+kafka-setup/*_override.tf.json
+
+# Logs
+*.log
+*.bak
+
+# VSCode
+.vscode/
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+
+# Lock
+kafka-setup/.terraform.lock.hcl
+
+# Tmp
+planfile
+*.backup
+history
