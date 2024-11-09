@@ -52,8 +52,7 @@ Then init.sh will be execute to :
 - Launch the container
 You need to wait few minutes for the environment to be ready. 
 
--> Go to http://\<Your EC2_DNS Instance>:3000 to test Grafana setup
-
+### Kafka usage tests
 Install in your local environment kcat tool to produce and or consume messages from a topic.
 But at this point we only test that kafka is reachable.
 ```
@@ -67,7 +66,18 @@ You can use this command to produce message on topic test, that will be covered 
 ```
 echo "msg0"| kcat -P -b <Your EC2_DNS Instance>:9092 -t test
 ```
-So now environment is ready to be used, and we will concentrate us on SingleStore Cloud  
+### Grafana tests
+
+- Go to http://\<Your EC2_DNS Instance>:3000 to test Grafana setup
+- Go to SingleStore Cloud/home and click on Connect to database to get the connection String. Warn : Select your workspace and database. (Note that for the purpose of the demo we will not manage security aspects to be concentrated on the use case - However this can be done easily in a next step). Use the parameters connexion provided :  
+  - Host: \<Your SingleStore Cloud Host>
+  - Port: 3306
+  - Username: admin 
+  - Password: \<your password>   
+  - Database: demo
+- Create a Datasource connexion in Grafana, using mysql connectors and fill the previous information. Let TLS/SSL options deactivated and Tests and save your datasource, it should be successful.
+
+So now environment is ready to be used, and we will concentrate us on SingleStore Cloud
 
 ## SingleStoreDB Cloud
 ### Create an environment
@@ -115,5 +125,7 @@ You will see that the pipeline remains in running status.
 ### Query your data
 ## Realtime Analysis
 ### Grafana
+We can use our previously Datasource Connector to begin to build a dashboard.
+Let's start by a very simple table panel to display all the data of a specific table, here the table messages is a good example to test the raw table data vizualisation.
 ### Test #1
 ### Test #2
