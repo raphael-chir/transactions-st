@@ -44,12 +44,31 @@ services:
 ```
 The objective is now to integrate SingleStore Cloud to a Kafka topic and connect Grafana to SingleStore.  
 Note that we use an environment variable to set your dns instance to Kafka, so that you can produce and consume messages externally from this ec2 instance.
-## Kafka Broker
-### Launch an EC2 Instances
-Go to kafka-setup folder where Terraform modules are ready to be used to launch an EC2 with Ubuntu OS, docker and docker-compose.
-### Install docker and docker-compose
-### Install Kafka
-### External Test with kcat
+## Setup
+Go to kafka-setup folder where Terraform modules are ready to be used to launch an EC2. This will provision an instance with ubuntu.
+Then init.sh will be execute to : 
+- Install docker, docker-compose, 
+- Clone the git repository 
+- Launch the container
+You need to wait few minutes for the environment to be ready. 
+
+-> Go to http://\<Your EC2_DNS Instance>:3000 to test Grafana setup
+
+Install in your local environment kcat tool to produce and or consume messages from a topic.
+But at this point we only test that kafka is reachable.
+```
+kcat -b <Your EC2_DNS Instance>:9092 -L
+```
+Test if you can reach out to test topics to consume a message (no messages for now)
+```
+kcat -C -b <Your EC2_DNS Instance>:9092 -t test
+```
+You can use this command to produce message on topic test, that will be covered later
+```
+echo "msg0"| kcat -P -b <Your EC2_DNS Instance>:9092 -t test
+```
+So now environment is ready to be used, and we will concentrate us on SingleStore Cloud  
+
 ## SingleStoreDB Cloud
 ### Create a table
 ### Create a pipeline

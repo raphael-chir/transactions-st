@@ -7,5 +7,5 @@ output "node01_public_ip" {
 }
 
 output "node01_public_dns" {
-  value = join("",["http://",module.node01.public_dns,":8091"])
+  value = join("",["http://",module.node01.public_dns,":3000"])
 }

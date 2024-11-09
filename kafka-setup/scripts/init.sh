@@ -17,3 +17,17 @@ curl -L "https://github.com/docker/compose/releases/latest/download/docker-compo
 chmod +x /usr/local/bin/docker-compose
 # Give docker permission to ubuntu user
 usermod -aG docker ubuntu
+# Install aws tools
+apt install amazon-ec2-utils
+# Create a workspace folder
+mkdir -p /home/ubuntu/workspace
+cd /home/ubuntu/workspace
+# Download docker-compose.yml
+git clone https://github.com/raphael-chir/transactions-st.git
+# Launch containers
+cd /home/ubuntu/workspace/transactions-st
+public_hostname=$(ec2-metadata -p | cut -d " " -f 2)
+env EC2_DNS=$public_hostname bash -c 'docker-compose up -d'
+# Create a topic
+sleep 20
+docker exec transactions-st-kafka-1 kafka-topics.sh --create --topic test --bootstrap-server $public_hostname:9092 --partitions 1 --replication-factor 1
