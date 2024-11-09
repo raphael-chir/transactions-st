@@ -77,6 +77,25 @@ echo "msg0"| kcat -P -b <Your EC2_DNS Instance>:9092 -t test
   - Database: demo
 - Create a Datasource connexion in Grafana, using mysql connectors and fill the previous information. Let TLS/SSL options deactivated and Tests and save your datasource, it should be successful.
 
+Nota : To get a near realtime dashboard (from the 5s default grafana to 250 ms)
+```
+docker exec -u 0 -it transactions-st-grafana-1 /bin/bash
+```
+Modify min_refresh_interval in conf/defaults.ini
+```
+#################################### Dashboards ##################
+
+[dashboards]                                                                   
+# Number dashboard versions to keep (per dashboard). Default: 20, Minimum: 1
+versions_to_keep = 20
+                                        
+# Minimum dashboard refresh interval. When set, this will restrict users to set the refresh interval of a dashboard lower than given interval. Per default this is 5 seconds.
+# The interval string is a possibly signed sequence of decimal numbers, followed by a unit suffix (ms, s, m, h, d), e.g. 30s or 1m.
+min_refresh_interval = 250ms                                          
+                      
+# Path to the default home dashboard. If this value is empty, then Grafana uses StaticRootPath + "dashboards/home.json"
+default_home_dashboard_path =     
+```       
 So now environment is ready to be used, and we will concentrate us on SingleStore Cloud
 
 ## SingleStoreDB Cloud
