@@ -70,8 +70,48 @@ echo "msg0"| kcat -P -b <Your EC2_DNS Instance>:9092 -t test
 So now environment is ready to be used, and we will concentrate us on SingleStore Cloud  
 
 ## SingleStoreDB Cloud
-### Create a table
-### Create a pipeline
+### Create an environment
+Go to https://www.singlestore.com/  
+Click on start free link, create an account and follow instructions.
+You will benefit from a shared tiers offer containing a starter-workspace containing one database. It can be usefull to test the different shared note books. Take time to discover the UI.
+
+To access to more features we will create a demo-workspace, and we will benefits from a set of credits offered by ST. Great. We start here now.
+
+### Create a database, table and pipeline
+
+Create a database from UI (Deployments link)
+- Select your Workspace
+- Click on Create Database (on the right above Databases blocks)
+- On the left inside Workspace block, select connect and SQL Editor
+
+Create tables
+```sql
+CREATE TABLE messages (id text);
+```
+
+Create a pipeline, follow the step to test integration :
+This will integrate the pipeline definition with your kafka instances. At this point we just expect that the pipeline can read kafka topic metadata and it is ready to consume messages
+```sql
+CREATE PIPELINE kafka_msg_consumer AS LOAD DATA KAFKA '<Your EC2_DNS Instance>/test' INTO TABLE messages;
+```
+Send a message to your kafka instance with kcat : 
+```
+echo "msg0"| kcat -P -b <Your EC2_DNS Instance>:9092 -t test
+```
+Test that this message is read by the pipeline, but not ingested at this point
+```
+TEST PIPELINE kafka_msg_consumer LIMIT 1;
+```
+Here is an example of starting and directly stop a consumptions
+```
+START PIPELINE kafka_msg_consumer FOREGROUND LIMIT 1 BATCHES;
+```
+You can start your pipeline to permanently listen to the topic
+```
+START PIPELINE kafka_msg_consumer;
+```
+You will see that the pipeline remains in running status.
+
 ### Query your data
 ## Realtime Analysis
 ### Grafana
