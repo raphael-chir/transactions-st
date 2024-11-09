@@ -141,6 +141,11 @@ START PIPELINE kafka_msg_consumer;
 ```
 You will see that the pipeline remains in running status.
 
+Here is a permanent message production example that can be used in your local terminal : 
+```
+while true; do date | kcat -P -b <Your EC2_DNS Instance>:9092 -t test; sleep 1; done
+```
+
 ### Query your data
 ## Realtime Analysis
 ### Grafana
