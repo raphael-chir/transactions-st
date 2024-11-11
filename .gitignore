@@ -27,3 +27,4 @@ kafka-setup/.terraform.lock.hcl
 planfile
 *.backup
 history
+myenv/
