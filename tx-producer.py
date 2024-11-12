@@ -54,7 +54,7 @@ def produce_messages(batch_size=10, pause=1):
             product = random.choice(products)
 
             message = {
-                "transaction_id": random.randint(1, 1000000),
+                "transaction_id": random.randint(1, 100000000),
                 "store_id": store["store_id"],
                 "city": store["city"],
                 "latitude": store["latitude"],
@@ -89,4 +89,4 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # Execution the production
 print("Start sending batch messages. Press Ctrl + C to stop.")
-produce_messages(batch_size=10000, pause=0.25)
+produce_messages(batch_size=100, pause=0.75)

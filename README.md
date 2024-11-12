@@ -335,19 +335,6 @@ python3 tx-producer.py
 CTL+C to stop the production
 
 ### Query your data
-Get the revenue earned the last 60s per city (1 store per city)
-```sql
-SELECT 
-    city,
-    SUM(total_amount) AS total_revenue
-FROM 
-    product_transactions
-WHERE 
-    transaction_date > CONVERT_TZ(NOW(), 'UTC', 'Europe/Paris') - INTERVAL 60 SECOND
-GROUP BY 
-    city
-ORDER BY total_revenue desc;
-```
 Get the number of transactions per stores aggregates per city.
 ```sql
 SELECT
@@ -356,9 +343,53 @@ SELECT
   longitude,
   COUNT(*) AS transaction_count
 FROM product_transactions
-GROUP BY city, latitude, longitude
+GROUP BY city
 ORDER BY transaction_count DESC
 ```
+Get the revenue earned the last 25s per city (1 store per city)
+```sql
+SELECT 
+    city,
+    SUM(total_amount) AS total_revenue
+FROM 
+    product_transactions
+WHERE 
+    transaction_date > CONVERT_TZ(NOW(), 'UTC', 'Europe/Paris') - INTERVAL 25 SECOND
+GROUP BY 
+    city
+ORDER BY total_revenue desc;
+```
+Get the best city (or store) that have sold the most a specific product with its quantity
+```sql
+SELECT 
+    city,
+    product_name,
+    SUM(quantity) AS total_items_sold
+FROM 
+    product_transactions
+GROUP BY 
+    city, product_name
+ORDER BY 
+    total_items_sold DESC
+LIMIT 1;
+```
+Get all the quantity of products sold by all the city
+```sql
+SELECT 
+    city,
+    product_name,
+    brand,
+    SUM(quantity) AS total_items_sold
+FROM 
+    product_transactions
+GROUP BY 
+    city, product_name, brand
+ORDER BY 
+    city,
+    total_items_sold DESC;
+```
+Finally we need a gauge to capture the number of transactions
+
 Execute each request on the query editor of Single Store and perform a Vizualisation Explain. As there is not a lot of data, no significant impact are identified.
 
 ## Realtime Analysis
@@ -367,6 +398,49 @@ We can use our previously Datasource Connector to begin to build a dashboard.
 Import the dashboard provided. And start your script.
 A gauge indicate the number of transactions, setup the refresh rate to 250 ms, and observe the pain, then setup 500ms.
 It is time to optimize our queries !
+### SingleStore
+On SingleStore Cloud, we can perform a Vizualisation Explain. Now let's discover Query history feature that store by default queries that execution time exceed 1s.
+I want to decrease this execution time parameter to see queries exceeded 200ms for instance.
+```sql
+DROP EVENT TRACE Query_completion;
+CREATE EVENT TRACE Query_completion WITH (Query_text = on, Duration_threshold_ms = 200);
+```
+Wait a moment and see the execution time of our queries
+You can perform a query profiling with vizual explain in the sql editor, you could easily track one exceeded 200ms. Wait a moment to see it in Query History.
+### Optimization
+I figure out that when I created the table, I didn't used a SHARD_KEY and it seems that if we change the distribution of our data per city or store_id instead of the default random one, we could get better performance on accessing data.
 
-### Test #1
-### Test #2
+```sql
+CREATE TABLE product_transactions_tmp (
+    transaction_id INT NOT NULL,
+    store_id INT NOT NULL,
+    city VARCHAR(50) NOT NULL,  
+    latitude DECIMAL(9, 6),
+    longitude DECIMAL(9, 6),
+    product_name VARCHAR(50) NOT NULL, 
+    brand VARCHAR(50),
+    transaction_date DATETIME NOT NULL,
+    quantity INT NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    customer_id int(11) NOT NULL,
+    payment_type varchar(50) NOT NULL,
+    PRIMARY KEY (transaction_id, store_id),
+    SHARD KEY (store_id),
+    SORT KEY (transaction_date)
+);
+```
+Then we copy our dataset into it
+```sql
+INSERT INTO product_transactions_tmp
+SELECT * FROM product_transactions;
+```
+We drop the previous table and rename the new one
+```sql
+DROP PIPELINE retails_kafka_consumer;
+DROP TABLE product_transactions;
+ALTER TABLE product_transactions_tmp RENAME product_transactions;
+CREATE PIPELINE retails_kafka_consumer AS LOAD DATA KAFKA '<Your EC2_DNS Instance>:9092/retails' SKIP DUPLICATE KEY ERRORS INTO TABLE product_transactions FORMAT JSON;
+START PIPELINE retails_kafka_consumer;
+```
+
+
