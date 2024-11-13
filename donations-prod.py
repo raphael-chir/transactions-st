@@ -29,7 +29,7 @@ singlestore_conf = {
 def deactivate_previous_campaigns():
     connection = mysql.connector.connect(**singlestore_conf)
     cursor = connection.cursor()
-    cursor.execute("UPDATE donation_transactions SET is_campaign_active = false")
+    cursor.execute("UPDATE donation_transactions SET is_campaign_active = 0")
     connection.commit()
     cursor.close()
     connection.close()
@@ -117,4 +117,4 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # Execution
 print("Start sending batch messages. Press Ctrl + C to stop.")
-produce_messages(batch_size=1, pause=0.1)
+produce_messages(batch_size=5, pause=1)
