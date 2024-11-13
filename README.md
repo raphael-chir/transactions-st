@@ -36,14 +36,14 @@
 ![Dash](donations_dash.gif "Donations")
 
 ## Use case
-This project is about the management of N campaigns to collect donation for 4 aids associations in 4 selected towns in France choosen among a list of 20 cities. Each campaign has a start time and a end time. The results is that we fill the database with millions of data.
+This project is about management of N campaigns to collect donations for 4 aids associations in 4 selected towns in France choosen among a list of 20 cities. Each campaign has a start time and an end time. The result is that we fill the database with millions of data.
 
 Technically :
 - Ingest transactions from Kafka to SingleStore Helios
 - Perform real-time analysis with SingleStore queries
 - Visualize the results in Grafana
 
-The aim of this demo is to optimized queries latencies with the usage of an adapted SHARD KEY AND SORT KEY, depending of which kind of analyze are the most relevant.
+The aim of this demo is to optimized queries latencies with the usage of an adapted SHARD KEY AND SORT KEY, depending of which kind of analyze is the most relevant.
 
 ## Architecture
 We use terraform to setup an ec2 instance reachable from internet.  
@@ -205,7 +205,7 @@ Let's start by a very simple table panel to display all the data of a specific t
 
 ## The pain
 I have built a grafana real-time analysis dashboard. Everything will go well until I will reach out to a significant number of transactions, because : 
-- My refresh rate on Grafana will be slower than the analytic SQL requests time execution and the dash is stucked !
+- My refresh rate on Grafana will be faster than the analytic SQL requests time execution and the dash is stucked !
 - Transaction insertions become more and more slower
 
 ## See the pain in action
